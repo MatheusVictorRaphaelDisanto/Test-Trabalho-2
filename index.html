@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clans BOT - Assistente Virtual</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3a0ca3;
+      --user-color: #4361ee;
+      --bot-color: #4cc9f0;
+      --background-color: #f8f9fa;
+      --card-color: #ffffff;
+      --text-color: #333333;
+      --light-text: #6c757d;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --border-radius: 12px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+
+    .logo i {
+      font-size: 2.5rem;
+      color: var(--primary-color);
+    }
+
+    h1 {
+      color: var(--primary-color);
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      color: var(--light-text);
+      font-size: 1.1rem;
+      margin-top: 5px;
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+
+    .status-online {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .status-offline {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .status-loading {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .status-online .status-dot {
+      background-color: #28a745;
+    }
+
+    .status-offline .status-dot {
+      background-color: #dc3545;
+    }
+
+    .status-loading .status-dot {
+      background-color: #ffc107;
+    }
+
+    .chat-container {
+      background-color: var(--card-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #chat {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      max-height: 500px;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      position: relative;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .user-message {
+      align-self: flex-end;
+      background-color: var(--user-color);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bot-message {
+      align-self: flex-start;
+      background-color: #f1f3f5;
+      color: var(--text-color);
+      border-bottom-left-radius: 4px;
+    }
+
+    .message-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+      font-size: 0.85rem;
+    }
+
+    .user-message .message-header {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .bot-message .message-header {
+      color: var(--light-text);
+    }
+
+    .message-header i {
+      margin-right: 6px;
+    }
+
+    .input-container {
+      display: flex;
+      padding: 20px;
+      background-color: var(--card-color);
+      border-top: 1px solid #e9ecef;
+    }
+
+    #inputMessage {
+      flex: 1;
+      padding: 14px 18px;
+      border: 1px solid #e1e5e9;
+      border-radius: 30px;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    #inputMessage:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+    }
+
+    #sendBtn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      margin-left: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #sendBtn:hover {
+      background-color: var(--secondary-color);
+      transform: scale(1.05);
+    }
+
+    #sendBtn:active {
+      transform: scale(0.98);
+    }
+
+    .typing-indicator {
+      display: none;
+      align-self: flex-start;
+      background-color: #f1f3f5;
+      padding: 12px 16px;
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+      margin-bottom: 15px;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--light-text);
+      animation: typingAnimation 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: 0s; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingAnimation {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-5px); }
+    }
+
+    .debug-info {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 15px;
+      font-size: 0.85rem;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      color: var(--light-text);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .message {
+        max-width: 90%;
+      }
+      
+      #chat {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <i class="fas fa-robot"></i>
+        <h1>Clans BOT</h1>
+      </div>
+      <p class="subtitle">Assistente especializado em Clash of Clans</p>
+      <div id="statusIndicator" class="status-indicator status-loading">
+        <div class="status-dot"></div>
+        <span>Testando conexão...</span>
+      </div>
+    </header>
+
+    <div class="chat-container">
+      <div id="chat">
+        <div class="message bot-message">
+          <div class="message-header">
+            <i class="fas fa-robot"></i>
+            Assistente
+          </div>
+          Olá! Sou o Clans BOT, especializado em Clash of Clans. Posso ajudar com estratégias, tropas, construções e muito mais!
+        </div>
+        <div class="message bot-message">
+          <div class="message-header">
+            <i class="fas fa-info-circle"></i>
+            Informação
+          </div>
+          Aguardando conexão com o servidor...
+        </div>
+      </div>
+      
+      <div class="typing-indicator" id="typingIndicator">
+        <div class="message-header">
+          <i class="fas fa-robot"></i>
+          Assistente está digitando...
+        </div>
+        <div class="typing-dots">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+      
+      <div class="input-container">
+        <input type="text" id="inputMessage" placeholder="Digite sua pergunta sobre Clash of Clans..." autocomplete="off" />
+        <button id="sendBtn">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="debug-info">
+      <strong>🔧 Informações de Debug:</strong>
+      <div id="debugContent">Carregando...</div>
+    </div>
+    
+    <footer>
+      <p>Clans BOT &copy; 2023 - Especializado em Clash of Clans</p>
+    </footer>
+  </div>
+
+  <script>
+    // CONFIGURAÇÃO - VERIFIQUE ESTAS URLS!
+    const API_CONFIG = {
+      // TENTE ESTAS OPÇÕES (descomente uma por vez):
+      baseUrl: "http://localhost:8000",
+      // baseUrl: "http://127.0.0.1:8000", 
+      // baseUrl: "http://0.0.0.0:8000",
+      
+      token: "SuaChaveAqui123"
+    };
+
+    const apiUrl = `${API_CONFIG.baseUrl}/api/v1/chat`;
+    
+    // Elementos DOM
+    const chatDiv = document.getElementById("chat");
+    const inputMessage = document.getElementById("inputMessage");
+    const sendBtn = document.getElementById("sendBtn");
+    const typingIndicator = document.getElementById("typingIndicator");
+    const statusIndicator = document.getElementById("statusIndicator");
+    const debugContent = document.getElementById("debugContent");
+
+    // Atualizar debug info
+    function updateDebugInfo(message) {
+      debugContent.innerHTML = message;
+      console.log("🔧 DEBUG:", message);
+    }
+
+    // Teste de conexão SIMPLIFICADO e ROBUSTO
+    async function testConnection() {
+      updateDebugInfo("Iniciando teste de conexão...");
+      
+      // URLs para testar (tentamos várias)
+      const testUrls = [
+        `${API_CONFIG.baseUrl}/health`,
+        `${API_CONFIG.baseUrl}/`,
+        `http://localhost:8000/health`,
+        `http://127.0.0.1:8000/health`
+      ];
+
+      for (let url of testUrls) {
+        try {
+          updateDebugInfo(`Testando: ${url}`);
+          
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 3000);
+          
+          const response = await fetch(url, {
+            method: 'GET',
+            signal: controller.signal
+          });
+          
+          clearTimeout(timeoutId);
+
+          if (response.ok) {
+            const data = await response.json();
+            statusIndicator.className = "status-indicator status-online";
+            statusIndicator.innerHTML = '<div class="status-dot"></div><span>Backend Online ✅</span>';
+            updateDebugInfo(`✅ CONEXÃO BEM-SUCEDIDA! Servidor respondendo em: ${url}`);
+            
+            // Remover mensagem de "aguardando conexão"
+            const waitingMessage = chatDiv.querySelector('.message:last-child');
+            if (waitingMessage && waitingMessage.textContent.includes('Aguardando conexão')) {
+              waitingMessage.remove();
+            }
+            
+            return true;
+          }
+        } catch (error) {
+          updateDebugInfo(`❌ Falha em ${url}: ${error.message}`);
+          // Continua para próxima URL
+        }
+      }
+
+      // Se todas as URLs falharem
+      statusIndicator.className = "status-indicator status-offline";
+      statusIndicator.innerHTML = '<div class="status-dot"></div><span>Backend Offline ❌</span>';
+      
+      updateDebugInfo(`
+        ❌ NÃO FOI POSSÍVEL CONECTAR AO BACKEND<br><br>
+        <strong>Para resolver:</strong><br>
+        1. 💻 Abra o terminal/prompt de comando<br>
+        2. 📁 Navegue até a pasta do backend<br>
+        3. 🚀 Execute: <code>python server_simple.py</code><br>
+        4. 🔄 Atualize esta página (F5)<br><br>
+        <em>Verifique se o servidor está rodando na porta 8000</em>
+      `);
+      
+      return false;
+    }
+
+    // Enviar mensagem - VERSÃO SIMPLIFICADA
+    async function sendMessage() {
+      const message = inputMessage.value.trim();
+      if (!message) return;
+
+      // Verificar se o backend está online primeiro
+      const isOnline = await testConnection();
+      if (!isOnline) {
+        appendMessage("Sistema", "❌ Servidor offline! Execute o servidor Python primeiro.", "bot");
+        return;
+      }
+
+      // Adicionar mensagem do usuário ao chat
+      appendMessage("Você", message, "user");
+      inputMessage.value = "";
+      
+      // Mostrar indicador de digitação
+      showTypingIndicator();
+
+      try {
+        updateDebugInfo("Enviando mensagem para o servidor...");
+        
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${API_CONFIG.token}`
+          },
+          body: JSON.stringify({
+            user_id: "web-user",
+            message: message
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+        }
+
+        const data = await response.json();
+        
+        hideTypingIndicator();
+        appendMessage("Assistente", data.reply, "bot");
+        updateDebugInfo("✅ Mensagem processada com sucesso!");
+        
+      } catch (error) {
+        hideTypingIndicator();
+        console.error("Erro:", error);
+        
+        appendMessage("Erro", `
+          ❌ Falha na comunicação:<br>
+          <strong>${error.message}</strong><br><br>
+          Verifique se o servidor está rodando corretamente.
+        `, "bot");
+        
+        updateDebugInfo(`❌ Erro: ${error.message}`);
+      }
+    }
+
+    function appendMessage(sender, text, type) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = type === "user" ? "message user-message" : "message bot-message";
+      
+      const messageHeader = document.createElement("div");
+      messageHeader.className = "message-header";
+      messageHeader.innerHTML = type === "user" 
+        ? `<i class="fas fa-user"></i>${sender}`
+        : `<i class="fas fa-robot"></i>${sender}`;
+      
+      messageDiv.appendChild(messageHeader);
+      
+      const textContent = document.createElement("div");
+      textContent.style.whiteSpace = "pre-line";
+      textContent.innerHTML = text;
+      messageDiv.appendChild(textContent);
+      
+      chatDiv.appendChild(messageDiv);
+      scrollChatToBottom();
+    }
+
+    function showTypingIndicator() {
+      typingIndicator.style.display = "block";
+      scrollChatToBottom();
+    }
+
+    function hideTypingIndicator() {
+      typingIndicator.style.display = "none";
+    }
+
+    function scrollChatToBottom() {
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+
+    // Event listeners
+    sendBtn.addEventListener("click", sendMessage);
+    inputMessage.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+
+    // Inicialização
+    window.addEventListener('load', () => {
+      inputMessage.focus();
+      updateDebugInfo("Página carregada. Iniciando testes...");
+      
+      // Testar conexão imediatamente e depois a cada 5 segundos
+      testConnection();
+      setInterval(testConnection, 5000);
+    });
+
+    // Botão manual para testar conexão
+    const testBtn = document.createElement('button');
+    testBtn.textContent = 'Testar Conexão Manualmente';
+    testBtn.style.marginTop = '10px';
+    testBtn.style.padding = '8px 16px';
+    testBtn.style.background = '#007bff';
+    testBtn.style.color = 'white';
+    testBtn.style.border = 'none';
+    testBtn.style.borderRadius = '4px';
+    testBtn.style.cursor = 'pointer';
+    testBtn.onclick = testConnection;
+    
+    debugContent.parentElement.appendChild(testBtn);
+  </script>
+</body>
+</html>
